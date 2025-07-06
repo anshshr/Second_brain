@@ -1,0 +1,11 @@
+{
+    "root": [
+        "./src/index.ts",
+        "./src/database/db.ts",
+        "./src/middleware/authmiddleware.ts",
+        "./src/models/content_model.ts",
+        "./src/models/tag_model.ts",
+        "./src/models/usermodel.ts"
+    ],
+    "version": "5.8.3"
+}
