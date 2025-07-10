@@ -4,9 +4,11 @@ import ContentGrid from '../components/ContentGrid';
 import QueryLLMSection from '../components/QueryLLMSection';
 
 // Sample data
-const sampleItems = [
+const sampleItems  = [
   { title: "React Docs", url: "https://react.dev ", tags: ["react", "docs"] },
-  { title: "Tailwind CSS Guide", url: "https://tailwindcss.com ", tags: ["ui", "tailwind"] }
+  { title: "Tailwind CSS Guide", url: "https://tailwindcss.com ", tags: ["ui", "tailwind"] },
+  { title: "Tailwind CSS Guide", url: "https://tailwindcss.com ", tags: ["ui", "tailwind"] },
+  { title: "Tailwind CSS Guide", url: "https://tailwindcss.com ", tags: ["ui", "tailwind"] },
 ];
 
 const Home = () => {

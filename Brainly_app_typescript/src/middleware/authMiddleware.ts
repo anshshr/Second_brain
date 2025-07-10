@@ -1,20 +1,40 @@
-import express, { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers["token"];
+export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+    try {
+        const authHeader = req.headers.authorization;
+        console.log("Auth header:", authHeader);
 
-    const decoded = jwt.verify(token as string, "ANSH")
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.log("No auth header or invalid format");
+            res.status(401).json({
+                message: "No token provided or invalid format"
+            });
+            return;
+        }
 
-    if (decoded) {
-        // @ts-ignore
-        req.userId = decoded.userId
-        next()
-    }
-    else {
+        const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+        console.log("Token:", token.substring(0, 20) + "...");
+
+        const decoded = jwt.verify(token, "ANSH") as { userId: string };
+        console.log("Decoded:", decoded);
+
+        if (decoded) {
+            req.userId = decoded.userId;
+            console.log("Auth successful for user:", decoded.userId);
+            next();
+        } else {
+            console.log("Token verification failed");
+            res.status(401).json({
+                message: "Invalid token"
+            });
+        }
+    } catch (error) {
+        console.log("Auth error:", error);
         res.status(401).json({
-            "message": "Please log in first"
-        })
+            message: "Invalid token"
+        });
     }
 }
 
