@@ -17,9 +17,12 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mongoose": "^5.11.97",
     "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "groq-sdk": "^0.26.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.0",
+    "typescript": "^5.8.3",
     "zod": "^3.25.67"
   }
 }
