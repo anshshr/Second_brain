@@ -3,6 +3,7 @@ import ContentGrid from '../components/ContentGrid';
 import AddContentModal from '../components/AddContentModal';
 import { useAuth } from '../contexts/AuthContext';
 import type { ContentType } from '../components/NoteCard';
+import BACKEND_URL from '../confg';
 
 interface ApiContent {
   _id: string;
@@ -43,8 +44,8 @@ const Dashboard = () => {
       }
 
       const url = type && type !== 'all'
-        ? `https://second-brain-wabf.onrender.com/get-content-by-type/${type}`
-        : 'https://second-brain-wabf.onrender.com/get-content';
+        ? `${BACKEND_URL}/get-content-by-type/${type}`
+        : `${BACKEND_URL}/get-content`;
 
       const response = await fetch(url, {
         headers: {
@@ -97,8 +98,8 @@ const Dashboard = () => {
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
                 className={`w-full flex items-center px-4 py-3 rounded-lg text-left transition-colors duration-200 ${selectedCategory === category.id
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                  : 'text-gray-600 hover:bg-gray-100'
                   }`}
               >
                 <span className="text-xl mr-3">{category.icon}</span>

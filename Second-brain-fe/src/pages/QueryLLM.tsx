@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import BACKEND_URL from '../confg';
 
 interface Message {
   id: string;
@@ -51,7 +52,7 @@ const QueryLLM = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://second-brain-wabf.onrender.com/query-llm', {
+      const response = await fetch(`${BACKEND_URL}/query-llm`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -161,8 +162,8 @@ const QueryLLM = () => {
               >
                 <div
                   className={`max-w-3xl ${message.type === 'user'
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                      : 'bg-white border border-gray-200 text-gray-800'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                    : 'bg-white border border-gray-200 text-gray-800'
                     } rounded-2xl px-6 py-4 shadow-sm`}
                 >
                   <div className="flex items-start space-x-3">

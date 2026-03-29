@@ -1,3 +1,5 @@
+import BACKEND_URL from "../confg";
+
 export interface ContentType {
   title: string;
   url: string;
@@ -30,7 +32,7 @@ const NoteCard = ({ title, url, tags, type, _id }: ContentType) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://second-brain-wabf.onrender.com/delete-content/${_id}`, {
+      const response = await fetch(`${BACKEND_URL}/delete-content/${_id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -50,7 +52,7 @@ const NoteCard = ({ title, url, tags, type, _id }: ContentType) => {
   const handleShare = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://second-brain-wabf.onrender.com/share-link', {
+      const response = await fetch(`${BACKEND_URL}/share-link`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

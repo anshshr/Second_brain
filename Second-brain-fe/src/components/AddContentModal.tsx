@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import BACKEND_URL from '../confg';
 
 interface AddContentModalProps {
   isOpen: boolean;
@@ -23,7 +24,7 @@ const AddContentModal = ({ isOpen, onClose, onContentAdded }: AddContentModalPro
       const token = localStorage.getItem('token');
       const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
 
-      const response = await fetch('https://second-brain-wabf.onrender.com/add-new-content', {
+      const response = await fetch(`${BACKEND_URL}/add-new-content`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

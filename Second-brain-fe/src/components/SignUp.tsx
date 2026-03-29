@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BACKEND_URL from '../confg';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ const SignUp = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('https://second-brain-wabf.onrender.com/signup', {
+      const response = await fetch(`${BACKEND_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

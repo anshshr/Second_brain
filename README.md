@@ -152,7 +152,7 @@ npm run build
 npm start
 ```
 
-Backend runs at `http://localhost:3000`.
+Backend runs at `BACKEND_URL/`.
 
 ## 3. Run Frontend
 

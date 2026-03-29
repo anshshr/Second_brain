@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import BACKEND_URL from '../confg';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ const SignIn = () => {
     setError('');
 
     try {
-      const response = await fetch('https://second-brain-wabf.onrender.com/signin', {
+      const response = await fetch(`${BACKEND_URL}/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
