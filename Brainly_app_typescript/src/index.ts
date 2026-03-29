@@ -254,7 +254,7 @@ app.delete("/delete-content/:id", authMiddleware, async (req, res) => {
 });
 
 // create a sharable link
-app.post("/share-link", authMiddleware, async (req, res) => {
+app.post("/share-link", async (req, res) => {
   try {
     // @ts-ignore
     const username = await UserModel.findOne({ _id: req.userId }).select(
