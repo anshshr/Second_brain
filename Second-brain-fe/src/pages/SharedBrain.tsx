@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BACKEND_URL from '../confg';
+import axios from 'axios';
 
 interface SharedBrainItem {
     _id: string;
@@ -48,15 +49,15 @@ const SharedBrain = () => {
             setError('');
 
             try {
-                const response = await fetch(`${BACKEND_URL}/brain/${encodeURIComponent(username)}`);
-                if (!response.ok) {
+                const response = await axios.get(`${BACKEND_URL}/brain/${encodeURIComponent(username)}`);
+                if (!response.data) {
                     if (response.status === 404) {
                         throw new Error('This shared brain does not exist.');
                     }
                     throw new Error('Failed to load shared brain');
                 }
 
-                const data: SharedBrainResponse = await response.json();
+                const data: SharedBrainResponse = await response.data;
                 setOwner(data.username);
                 setItems(data.userData || []);
             } catch (err) {
