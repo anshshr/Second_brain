@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import Groq from "groq-sdk";
 import databaseConnections from "./database/db";
 import UserModel from "./models/usermodel";
@@ -17,6 +18,11 @@ const groq = new Groq({
 });
 
 const app = express();
+const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS || 10);
+
+const isBcryptHash = (value: string): boolean => {
+  return /^\$2[abxy]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(value);
+};
 
 databaseConnections();
 app.use(cors()); // Enable CORS for all routes
@@ -91,7 +97,15 @@ app.post("/signup", async (req, res) => {
         return;
       }
 
-      const newUser = new UserModel(req.body);
+      const hashedPassword = await bcrypt.hash(
+        req.body.password,
+        BCRYPT_SALT_ROUNDS,
+      );
+
+      const newUser = new UserModel({
+        username: req.body.username,
+        password: hashedPassword,
+      });
       await newUser.save();
       res.status(200).json({
         message: "User successfully created",
@@ -123,7 +137,33 @@ app.post("/signin", async (req, res) => {
         username: req.body.username,
       });
 
-      if (existingUser && existingUser.password === req.body.password) {
+      if (!existingUser) {
+        res.status(401).json({
+          message: "Invalid username or password",
+        });
+        return;
+      }
+
+      let isPasswordValid = false;
+
+      if (isBcryptHash(existingUser.password)) {
+        isPasswordValid = await bcrypt.compare(
+          req.body.password,
+          existingUser.password,
+        );
+      } else {
+        // Backward compatibility for old plain-text records.
+        isPasswordValid = existingUser.password === req.body.password;
+        if (isPasswordValid) {
+          existingUser.password = await bcrypt.hash(
+            req.body.password,
+            BCRYPT_SALT_ROUNDS,
+          );
+          await existingUser.save();
+        }
+      }
+
+      if (isPasswordValid) {
         const token = jwt.sign(
           { userId: existingUser._id },
           process.env.JWT_SECRET || "",
@@ -135,12 +175,12 @@ app.post("/signin", async (req, res) => {
           message: "Successfully signed in",
         });
         return;
-      } else {
-        res.status(401).json({
-          message: "Invalid username or password",
-        });
-        return;
       }
+
+      res.status(401).json({
+        message: "Invalid username or password",
+      });
+      return;
     } else {
       res.status(400).json({
         message: "Validation failed",
