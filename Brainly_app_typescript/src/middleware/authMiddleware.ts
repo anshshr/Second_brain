@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     try {
@@ -17,7 +20,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
         const token = authHeader.substring(7); // Remove 'Bearer ' prefix
         console.log("Token:", token.substring(0, 20) + "...");
 
-        const decoded = jwt.verify(token, "ANSH") as { userId: string };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as { userId: string };
         console.log("Decoded:", decoded);
 
         if (decoded) {

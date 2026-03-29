@@ -1,10 +1,12 @@
 import mongoose, { connection } from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
+const url = process.env.MONGODB_URI || "";
 
 async function databaseConnections() {
-    const connection = await mongoose.connect("mongodb+srv://anshshriofficial:MafbZcoXh3WuhtS8@railmadad.t2amj.mongodb.net/?retryWrites=true&w=majority&appName=railMadad")
-    console.log("database connected successfully");
-
+  const connection = await mongoose.connect(url);
+  console.log("database connected successfully");
 }
 
-
-export default databaseConnections 
+export default databaseConnections;
