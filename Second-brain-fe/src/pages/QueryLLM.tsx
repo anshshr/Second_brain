@@ -51,7 +51,7 @@ const QueryLLM = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/query-llm', {
+      const response = await fetch('https://second-brain-wabf.onrender.com/query-llm', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -65,7 +65,7 @@ const QueryLLM = () => {
       }
 
       const data = await response.json();
-      
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -160,23 +160,21 @@ const QueryLLM = () => {
                 className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-3xl ${
-                    message.type === 'user'
+                  className={`max-w-3xl ${message.type === 'user'
                       ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
                       : 'bg-white border border-gray-200 text-gray-800'
-                  } rounded-2xl px-6 py-4 shadow-sm`}
+                    } rounded-2xl px-6 py-4 shadow-sm`}
                 >
                   <div className="flex items-start space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      message.type === 'user' ? 'bg-white/20' : 'bg-gradient-to-r from-blue-500 to-purple-600'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.type === 'user' ? 'bg-white/20' : 'bg-gradient-to-r from-blue-500 to-purple-600'
+                      }`}>
                       <span className={`text-sm ${message.type === 'user' ? 'text-white' : 'text-white'}`}>
                         {message.type === 'user' ? '👤' : '🤖'}
                       </span>
                     </div>
                     <div className="flex-1">
                       <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                      
+
                       {/* Related Links */}
                       {message.relatedLinks && message.relatedLinks.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-gray-200">
@@ -211,7 +209,7 @@ const QueryLLM = () => {
                           </div>
                         </div>
                       )}
-                      
+
                       <p className="text-xs opacity-70 mt-2">
                         {message.timestamp.toLocaleTimeString()}
                       </p>
@@ -221,7 +219,7 @@ const QueryLLM = () => {
               </div>
             ))
           )}
-          
+
           {loading && (
             <div className="flex justify-start">
               <div className="bg-white border border-gray-200 rounded-2xl px-6 py-4 shadow-sm">
@@ -238,7 +236,7 @@ const QueryLLM = () => {
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
 

@@ -22,8 +22,8 @@ const AddContentModal = ({ isOpen, onClose, onContentAdded }: AddContentModalPro
     try {
       const token = localStorage.getItem('token');
       const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-      
-      const response = await fetch('http://localhost:3000/add-new-content', {
+
+      const response = await fetch('https://second-brain-wabf.onrender.com/add-new-content', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,9 +1,9 @@
 export interface ContentType {
-    title: string;
-    url: string;
-    tags: string[];
-    type?: string;
-    _id?: string;
+  title: string;
+  url: string;
+  tags: string[];
+  type?: string;
+  _id?: string;
 }
 
 const getTypeIcon = (url: string, type?: string) => {
@@ -16,7 +16,7 @@ const getTypeIcon = (url: string, type?: string) => {
       default: return '🔗';
     }
   }
-  
+
   // Fallback based on URL
   if (url.includes('youtube.com') || url.includes('youtu.be')) return '🎥';
   if (url.includes('spotify.com') || url.includes('soundcloud.com')) return '🎵';
@@ -27,17 +27,17 @@ const getTypeIcon = (url: string, type?: string) => {
 const NoteCard = ({ title, url, tags, type, _id }: ContentType) => {
   const handleDelete = async () => {
     if (!_id) return;
-    
+
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/delete-content/${_id}`, {
+      const response = await fetch(`https://second-brain-wabf.onrender.com/delete-content/${_id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (response.ok) {
         // Reload the page to refresh content
         window.location.reload();
@@ -50,14 +50,14 @@ const NoteCard = ({ title, url, tags, type, _id }: ContentType) => {
   const handleShare = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/share-link', {
+      const response = await fetch('https://second-brain-wabf.onrender.com/share-link', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         // Copy share link to clipboard
@@ -77,35 +77,35 @@ const NoteCard = ({ title, url, tags, type, _id }: ContentType) => {
           <h3 className="font-semibold text-gray-900 text-lg">{title}</h3>
         </div>
       </div>
-      
-      <a 
-        href={url} 
-        target="_blank" 
-        rel="noopener noreferrer" 
+
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
         className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-3 block truncate"
       >
         {url}
       </a>
-      
+
       <div className="mb-4">
         {tags.map((tag) => (
-          <span 
-            key={tag} 
+          <span
+            key={tag}
             className="inline-block mr-2 mb-1 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
           >
             #{tag}
           </span>
         ))}
       </div>
-      
+
       <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-        <button 
+        <button
           onClick={handleDelete}
           className="text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
         >
           🗑️ Delete
         </button>
-        <button 
+        <button
           onClick={handleShare}
           className="text-sm text-blue-500 hover:text-blue-700 font-medium transition-colors"
         >

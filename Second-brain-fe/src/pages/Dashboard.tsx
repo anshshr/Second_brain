@@ -34,7 +34,7 @@ const Dashboard = () => {
   const fetchContent = async (type?: string) => {
     setLoading(true);
     setError('');
-    
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -42,9 +42,9 @@ const Dashboard = () => {
         return;
       }
 
-      const url = type && type !== 'all' 
-        ? `http://localhost:3000/get-content-by-type/${type}`
-        : 'http://localhost:3000/get-content';
+      const url = type && type !== 'all'
+        ? `https://second-brain-wabf.onrender.com/get-content-by-type/${type}`
+        : 'https://second-brain-wabf.onrender.com/get-content';
 
       const response = await fetch(url, {
         headers: {
@@ -58,7 +58,7 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-      
+
       // Transform API data to match ContentType interface
       const transformedContent: ContentType[] = data.content.map((item: ApiContent) => ({
         _id: item._id,
@@ -67,7 +67,7 @@ const Dashboard = () => {
         tags: item.tags,
         type: item.type
       }));
-      
+
       setContent(transformedContent);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -90,24 +90,23 @@ const Dashboard = () => {
       <aside className="w-64 bg-white shadow-lg border-r border-gray-200">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-8">Second Brain</h1>
-          
+
           <nav className="space-y-2">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
-                className={`w-full flex items-center px-4 py-3 rounded-lg text-left transition-colors duration-200 ${
-                  selectedCategory === category.id
+                className={`w-full flex items-center px-4 py-3 rounded-lg text-left transition-colors duration-200 ${selectedCategory === category.id
                     ? 'bg-blue-100 text-blue-700 border border-blue-200'
                     : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 <span className="text-xl mr-3">{category.icon}</span>
                 <span className="font-medium">{category.name}</span>
               </button>
             ))}
           </nav>
-          
+
           {/* AI Query Section */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <a
@@ -118,7 +117,7 @@ const Dashboard = () => {
               <span className="font-medium">AI Assistant</span>
             </a>
           </div>
-          
+
           {/* Logout Button */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <button
@@ -162,7 +161,7 @@ const Dashboard = () => {
           ) : error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
               <p className="text-red-600 font-medium">{error}</p>
-              <button 
+              <button
                 onClick={() => fetchContent(selectedCategory)}
                 className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
               >
@@ -174,7 +173,7 @@ const Dashboard = () => {
               <div className="text-6xl mb-4">📭</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No content found</h3>
               <p className="text-gray-600">
-                {selectedCategory === 'all' 
+                {selectedCategory === 'all'
                   ? 'Start by adding some content to your brain!'
                   : `No ${categories.find(cat => cat.id === selectedCategory)?.name.toLowerCase()} found.`
                 }
