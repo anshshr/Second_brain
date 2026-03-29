@@ -157,10 +157,8 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-app.use(authMiddleware);
-
 // add the new content
-app.post("/add-new-content", async (req, res) => {
+app.post("/add-new-content", authMiddleware, async (req, res) => {
   try {
     const link = req.body.link;
     const type = req.body.type;
@@ -189,7 +187,7 @@ app.post("/add-new-content", async (req, res) => {
 });
 
 // fetch all the document
-app.get("/get-content", async (req, res) => {
+app.get("/get-content", authMiddleware, async (req, res) => {
   try {
     // @ts-ignore
     const content = await contentModel
@@ -206,7 +204,7 @@ app.get("/get-content", async (req, res) => {
 });
 
 // fetch content by type
-app.get("/get-content-by-type/:type", async (req, res) => {
+app.get("/get-content-by-type/:type", authMiddleware, async (req, res) => {
   try {
     const { type } = req.params;
     // @ts-ignore
@@ -228,7 +226,7 @@ app.get("/get-content-by-type/:type", async (req, res) => {
 });
 
 // delete a content with the given id
-app.delete("/delete-content/:id", async (req, res) => {
+app.delete("/delete-content/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     // @ts-ignore
@@ -256,7 +254,7 @@ app.delete("/delete-content/:id", async (req, res) => {
 });
 
 // create a sharable link
-app.post("/share-link", async (req, res) => {
+app.post("/share-link", authMiddleware, async (req, res) => {
   try {
     // @ts-ignore
     const username = await UserModel.findOne({ _id: req.userId }).select(
@@ -274,7 +272,7 @@ app.post("/share-link", async (req, res) => {
 });
 
 // LLM Query endpoint
-app.post("/query-llm", async (req, res) => {
+app.post("/query-llm", authMiddleware, async (req, res) => {
   try {
     const { query } = req.body;
 
