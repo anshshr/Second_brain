@@ -45,6 +45,35 @@ const userObject = z.object({
     }),
 });
 
+// Public shared brain endpoint
+app.get("/brain/:username", async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const user = await UserModel.findOne({ username }).select("_id username");
+    if (!user) {
+      res.status(404).json({
+        message: "User not found",
+      });
+      return;
+    }
+
+    const userData = await contentModel
+      .find({ userId: user._id })
+      .populate("userId", "username")
+      .sort({ _id: -1 });
+
+    res.status(200).json({
+      username: user.username,
+      userData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error,
+    });
+  }
+});
+
 // sign up a user
 app.post("/signup", async (req, res) => {
   try {
@@ -128,70 +157,39 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-// Public shared brain endpoint
-app.get("/brain/:username", async (req, res): Promise<void> => {
+app.use(authMiddleware);
+
+// add the new content
+app.post("/add-new-content", async (req, res) => {
   try {
-    const { username } = req.params;
+    const link = req.body.link;
+    const type = req.body.type;
+    const title = req.body.title;
+    const tags = req.body.tags;
+    // @ts-ignore
+    const userId = req.userId;
 
-    const user = await UserModel.findOne({ username }).select("_id username");
-    if (!user) {
-      res.status(404).json({
-        message: "User not found",
-      });
-      return;
-    }
+    const newContent = new contentModel({
+      link,
+      type,
+      title,
+      tags,
+      userId,
+    });
 
-    const userData = await contentModel
-      .find({ userId: user._id })
-      .populate("userId", "username")
-      .sort({ _id: -1 });
-
+    await newContent.save();
     res.status(200).json({
-      username: user.username,
-      userData,
+      message: "content succesfuly saved",
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(401).json({
       error,
     });
   }
 });
 
-// add the new content
-app.post(
-  "/add-new-content",
-  authMiddleware,
-  async (req, res): Promise<void> => {
-    try {
-      const link = req.body.link;
-      const type = req.body.type;
-      const title = req.body.title;
-      const tags = req.body.tags;
-      // @ts-ignore
-      const userId = req.userId;
-
-      const newContent = new contentModel({
-        link,
-        type,
-        title,
-        tags,
-        userId,
-      });
-
-      await newContent.save();
-      res.status(200).json({
-        message: "content succesfuly saved",
-      });
-    } catch (error) {
-      res.status(401).json({
-        error,
-      });
-    }
-  },
-);
-
 // fetch all the document
-app.get("/get-content", authMiddleware, async (req, res): Promise<void> => {
+app.get("/get-content", async (req, res) => {
   try {
     // @ts-ignore
     const content = await contentModel
@@ -208,65 +206,57 @@ app.get("/get-content", authMiddleware, async (req, res): Promise<void> => {
 });
 
 // fetch content by type
-app.get(
-  "/get-content-by-type/:type",
-  authMiddleware,
-  async (req, res): Promise<void> => {
-    try {
-      const { type } = req.params;
-      // @ts-ignore
-      const content = await contentModel
-        .find({
-          userId: req.userId,
-          type: type,
-        })
-        .populate("userId", "username");
+app.get("/get-content-by-type/:type", async (req, res) => {
+  try {
+    const { type } = req.params;
+    // @ts-ignore
+    const content = await contentModel
+      .find({
+        userId: req.userId,
+        type: type,
+      })
+      .populate("userId", "username");
 
-      res.status(200).json({
-        content,
-      });
-    } catch (error) {
-      res.status(401).json({
-        error,
-      });
-    }
-  },
-);
+    res.status(200).json({
+      content,
+    });
+  } catch (error) {
+    res.status(401).json({
+      error,
+    });
+  }
+});
 
 // delete a content with the given id
-app.delete(
-  "/delete-content/:id",
-  authMiddleware,
-  async (req, res): Promise<void> => {
-    try {
-      const { id } = req.params;
-      // @ts-ignore
-      const delete_content = await contentModel.findOneAndDelete({
-        _id: id,
-        userId: req.userId,
-      });
+app.delete("/delete-content/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    // @ts-ignore
+    const delete_content = await contentModel.findOneAndDelete({
+      _id: id,
+      userId: req.userId,
+    });
 
-      if (!delete_content) {
-        res.status(404).json({
-          message: "Content not found",
-        });
-        return;
-      }
-
-      res.status(200).json({
-        message: "Content deleted successfully",
-        delete_content,
+    if (!delete_content) {
+      res.status(404).json({
+        message: "Content not found",
       });
-    } catch (error) {
-      res.status(401).json({
-        error,
-      });
+      return;
     }
-  },
-);
+
+    res.status(200).json({
+      message: "Content deleted successfully",
+      delete_content,
+    });
+  } catch (error) {
+    res.status(401).json({
+      error,
+    });
+  }
+});
 
 // create a sharable link
-app.post("/share-link", authMiddleware, async (req, res) => {
+app.post("/share-link", async (req, res) => {
   try {
     // @ts-ignore
     const username = await UserModel.findOne({ _id: req.userId }).select(
@@ -284,7 +274,7 @@ app.post("/share-link", authMiddleware, async (req, res) => {
 });
 
 // LLM Query endpoint
-app.post("/query-llm", authMiddleware, async (req, res): Promise<void> => {
+app.post("/query-llm", async (req, res) => {
   try {
     const { query } = req.body;
 
