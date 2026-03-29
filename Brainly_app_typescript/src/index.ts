@@ -26,6 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.send("hey there");
 });
+app.get("/health", (req, res) => {
+  res.send("System is healthy");
+});
 
 const userObject = z.object({
   username: z.string().min(3).max(30),
@@ -340,10 +343,6 @@ If the query is about a specific topic and they have related content, suggest th
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
-});
-
-app.get("/health", (req, res) => {
-  res.send("System is healthy");
 });
 
 app.listen(3000, () => {
