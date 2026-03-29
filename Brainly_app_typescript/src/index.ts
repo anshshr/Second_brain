@@ -128,39 +128,70 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-app.use(authMiddleware);
-
-// add the new content
-app.post("/add-new-content", async (req, res): Promise<void> => {
+// Public shared brain endpoint
+app.get("/brain/:username", async (req, res): Promise<void> => {
   try {
-    const link = req.body.link;
-    const type = req.body.type;
-    const title = req.body.title;
-    const tags = req.body.tags;
-    // @ts-ignore
-    const userId = req.userId;
+    const { username } = req.params;
 
-    const newContent = new contentModel({
-      link,
-      type,
-      title,
-      tags,
-      userId,
-    });
+    const user = await UserModel.findOne({ username }).select("_id username");
+    if (!user) {
+      res.status(404).json({
+        message: "User not found",
+      });
+      return;
+    }
 
-    await newContent.save();
+    const userData = await contentModel
+      .find({ userId: user._id })
+      .populate("userId", "username")
+      .sort({ _id: -1 });
+
     res.status(200).json({
-      message: "content succesfuly saved",
+      username: user.username,
+      userData,
     });
   } catch (error) {
-    res.status(401).json({
+    res.status(500).json({
       error,
     });
   }
 });
 
+// add the new content
+app.post(
+  "/add-new-content",
+  authMiddleware,
+  async (req, res): Promise<void> => {
+    try {
+      const link = req.body.link;
+      const type = req.body.type;
+      const title = req.body.title;
+      const tags = req.body.tags;
+      // @ts-ignore
+      const userId = req.userId;
+
+      const newContent = new contentModel({
+        link,
+        type,
+        title,
+        tags,
+        userId,
+      });
+
+      await newContent.save();
+      res.status(200).json({
+        message: "content succesfuly saved",
+      });
+    } catch (error) {
+      res.status(401).json({
+        error,
+      });
+    }
+  },
+);
+
 // fetch all the document
-app.get("/get-content", async (req, res): Promise<void> => {
+app.get("/get-content", authMiddleware, async (req, res): Promise<void> => {
   try {
     // @ts-ignore
     const content = await contentModel
@@ -177,26 +208,30 @@ app.get("/get-content", async (req, res): Promise<void> => {
 });
 
 // fetch content by type
-app.get("/get-content-by-type/:type", async (req, res): Promise<void> => {
-  try {
-    const { type } = req.params;
-    // @ts-ignore
-    const content = await contentModel
-      .find({
-        userId: req.userId,
-        type: type,
-      })
-      .populate("userId", "username");
+app.get(
+  "/get-content-by-type/:type",
+  authMiddleware,
+  async (req, res): Promise<void> => {
+    try {
+      const { type } = req.params;
+      // @ts-ignore
+      const content = await contentModel
+        .find({
+          userId: req.userId,
+          type: type,
+        })
+        .populate("userId", "username");
 
-    res.status(200).json({
-      content,
-    });
-  } catch (error) {
-    res.status(401).json({
-      error,
-    });
-  }
-});
+      res.status(200).json({
+        content,
+      });
+    } catch (error) {
+      res.status(401).json({
+        error,
+      });
+    }
+  },
+);
 
 // delete a content with the given id
 app.delete(
@@ -231,29 +266,15 @@ app.delete(
 );
 
 // create a sharable link
-app.post("/share-link", async (req, res) => {
+app.post("/share-link", authMiddleware, async (req, res) => {
   try {
     // @ts-ignore
-    const username = await UserModel.findOne({ _id: req.userId });
+    const username = await UserModel.findOne({ _id: req.userId }).select(
+      "username",
+    );
 
     res.status(200).json({
       link: username,
-    });
-  } catch (error) {
-    res.status(401).json({
-      error,
-    });
-  }
-});
-
-app.get("/brain/:sharelink", async (req, res) => {
-  try {
-    const username = req.body.username;
-    //@ts-ignore
-    const userData = await contentModel.find({ userId: req.userId });
-    res.status(200).json({
-      username: username,
-      userData,
     });
   } catch (error) {
     res.status(401).json({
